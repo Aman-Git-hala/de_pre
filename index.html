@@ -1,0 +1,592 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>The Digital Decade — 50% Opaque Blocks</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/theme/black.min.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800;900&display=swap');
+
+  :root{
+    --main:'Inter',sans-serif;
+    --panel-light: rgba(255,255,255,0.94);
+    --panel-dark: rgba(0,0,0,0.62);
+  }
+
+  html,body{height:100%;margin:0;font-family:var(--main);background:#000;}
+
+  /* background images */
+  #bg-fill{ position:fixed; inset:0; width:100%; height:100%; object-fit:cover; filter: blur(28px) brightness(.34); z-index:0; pointer-events:none; transition:opacity .45s;}
+  #bg-contain{ position:fixed; left:50%; top:50%; transform:translate(-50%,-50%); max-width:100%; max-height:100%; object-fit:contain; z-index:1; pointer-events:none; transition:opacity .45s;}
+
+  /* reveal wrapper - slides above backgrounds */
+  .reveal .slides{ height:100%; z-index:3; text-align:center; display:flex; align-items:center; justify-content:center; }
+  .reveal section{ background:transparent !important; padding:28px; box-sizing:border-box; width:100%; max-width:1200px; margin:0 auto; position:relative;
+                    display:flex; align-items:center; justify-content:center; flex-direction:column; text-align:center; transition: all .28s ease; }
+
+  /* HEADERS default color (black) — but will be overridden in ott via a stronger rule */
+  h1, h2, h3 { color: #000 !important; text-shadow: 0 2px 8px rgba(255,255,255,0.06); }
+
+  /* SENTENCE BLOCKS (per-sentence translucent backgrounds) */
+  .sentences { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; align-items:center; margin-top:12px; }
+  .sent-block {
+    /* Default for non-network slides or when not explicitly set */
+    background: rgba(255,255,255,0.25);    /* white at 25% */
+    color: #000;                          /* black text */
+    padding: 8px 14px;
+    border-radius: 10px;
+    display:inline-block;
+    font-size:1.05rem;
+    line-height:1.4;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    max-width: 100%;
+  }
+
+  /* ===== MODIFIED: 50% opaque background for .sent-block when data-section="network" ===== */
+  body[data-state="network"] .sent-block {
+    background: rgba(255, 255, 255, 0.5) !important; /* 50% opaque white */
+    color: #000 !important; /* Keep text black for contrast */
+    text-shadow: none; /* Remove text shadow */
+    box-shadow: 0 6px 20px rgba(0,0,0,0.05); /* Keep a subtle shadow */
+  }
+
+  /* Dark variant used for image3+ (OTT) slides — still kept for contrast */
+  .sent-block.dark {
+    background: rgba(0,0,0,0.25) !important;  /* black at 25% */
+    color: #fff !important;
+    box-shadow: 0 8px 28px rgba(0,0,0,0.35);
+    text-shadow: 0 6px 26px rgba(0,0,0,0.6); /* Keep text shadow for dark background */
+  }
+
+  /*
+   * Move everything to top when network (image1) is active.
+   * Added !important to override reveal.js default centering.
+  */
+  body[data-state="network"] .reveal section[data-section="network"] {
+    align-items: flex-start !important;      /* <-- FORCED */
+    justify-content: flex-start !important;  /* <-- FORCED */
+    padding-top: 4.5vh;    /* nudges content toward top */
+  }
+  
+  /* But keep charts centered visually within the slide */
+  body[data-state="network"] .reveal section[data-section="network"] .chart-container {
+    align-self: center;        /* prevents charts from being pushed to top */
+    margin-top: 18px;
+  }
+
+  /* Keep other slides vertically centered (default) */
+  .title-slide h1 { margin: 0 0 6px 0; font-weight:900; font-size:3.4rem; }
+  /* MODIFIED: Remove background from the p tag on the title slide */
+  .title-slide p { margin:0; color: #222; background: none !important; }
+
+  .banger-slide { gap:10px; padding:40px 20px; }
+  h2 { font-weight:800; font-size:2.0rem; margin:0 0 6px 0; }
+
+  /* centered chart panel and dark variant */
+  .chart-container{ margin:18px auto; width:84vw; max-width:1000px; height:52vh; border-radius:12px; padding:12px; display:flex; align-items:center; justify-content:center; background:var(--panel-light); box-shadow:0 18px 40px rgba(0,0,0,0.12); }
+  .chart-container.dark{ background:var(--panel-dark); box-shadow:0 20px 60px rgba(0,0,0,0.6); }
+  .chart-wrap{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
+  .chart-wrap canvas{ max-width:100%; max-height:100%; width:100% !important; height:100% !important; }
+
+  .text-card{ background: transparent; padding:10px 18px; border-radius:10px; max-width:880px; margin:10px auto; }
+
+  .cols{ display:flex; gap:22px; justify-content:center; flex-wrap:wrap; margin-top:12px; }
+  .col{ flex:1 1 320px; min-width:240px; max-width:460px; text-align:center; }
+
+  .slide-footer{ position:absolute; bottom:14px; left:20px; right:20px; text-align:center; font-size:13px; opacity:.9; color:inherit; }
+
+  #fullscreen-btn{ position:fixed; top:12px; right:12px; z-index:99999; padding:8px 12px; border-radius:8px; background:rgba(255,255,255,0.9); color:#000; border:1px solid rgba(0,0,0,0.06); cursor:pointer; }
+  
+  /* ===== TIMER STYLES ===== */
+  #timer-display {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 99999;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.9);
+    color: #000;
+    font-family: var(--main);
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    user-select: none;
+    min-width: 50px;
+    text-align: center;
+  }
+  /* Red blinking flare */
+  #timer-display.negative {
+    color: #fff;
+    background: #d90429; /* Red color */
+    animation: pulse 1s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(217, 4, 41, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(217, 4, 41, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(217, 4, 41, 0); }
+  }
+  /* ===== END: TIMER STYLES ===== */
+
+  /* outgoing zoom animation */
+  .slide-zoom-out{ animation: slideZoomOut .55s cubic-bezier(.2,.9,.2,1) forwards; transform-origin:50% 20%; will-change:transform,opacity; pointer-events:none; }
+  @keyframes slideZoomOut{ 0%{transform:translateY(0) scale(1);opacity:1;} 40%{transform:translateY(-18px) scale(0.92);opacity:.95;} 100%{transform:translateY(-1200px) scale(0.52);opacity:0;} }
+  .reveal.slide-animating{ overflow:visible; }
+
+  /* ===== SPECIFIC OVERRIDES FOR IMAGE3 (OTT): MAKE ALL TEXT WHITE ===== */
+  body[data-state="ott"] h1,
+  body[data-state="ott"] h2,
+  body[data-state="ott"] h3,
+  body[data-state="ott"] p,
+  body[data-state="ott"] li,
+  body[data-state="ott"] .sent-block {
+    color: #fff !important;
+    text-shadow: 0 6px 26px rgba(0,0,0,0.6);
+  }
+
+  /* ensure sent-block dark class still shows dark background (keeps contrast) */
+  body[data-state="ott"] .sent-block.dark {
+    background: rgba(0,0,0,0.32) !important; /* Kept for contrast in dark theme */
+    color: #fff !important;
+  }
+
+  @media (max-width:900px){
+    h1{font-size:2.2rem;}
+    .chart-container{ width:92vw; height:40vh; }
+    .sent-block{ font-size:0.96rem; padding:6px 10px; }
+  }
+</style>
+</head>
+<body>
+
+  <img id="bg-fill" src="image1.jpg" alt="bg fill (blur)">
+  <img id="bg-contain" src="image1.jpg" alt="bg contain (full)">
+
+  <div id="timer-display">10:00</div>
+
+  <button id="fullscreen-btn">Fullscreen</button>
+
+  <div class="reveal">
+    <div class="slides">
+
+      <section class="title-slide" data-section="network">
+        <h1>THE DIGITAL DECADE</h1>
+        <p style="font-weight:600">How India Was Rewired: 2015 — 2025</p>
+
+        <div class="sentences" aria-hidden="false">
+          <span class="sent-block">Connectivity scaled fast and cheap.</span>
+          <span class="sent-block">Payments became instant and interoperable.</span>
+          <span class="sent-block">Content found a new regional audience.</span>
+        </div>
+        <div class="slide-footer">Presentation — The Digital Decade</div>
+      </section>
+
+      <section class="banger-slide" data-section="network">
+        <h2>How do you digitally connect a nation of 1.4 billion in 10 years?</h2>
+        <div class="sentences">
+          <span class="sent-block">You make access affordable.</span>
+          <span class="sent-block">You build public rails.</span>
+          <span class="sent-block">You let people invent use-cases.</span>
+        </div>
+      </section>
+
+      <section data-section="network">
+        <div>
+          <h2>Network — Quick Snapshot</h2>
+          <div class="sentences">
+            <span class="sent-block">Data price fell >95% (2015→2025).</span>
+            <span class="sent-block">Smartphone affordability widened reach.</span>
+            <span class="sent-block">Rural adoption accelerated growth.</span>
+          </div>
+        </div>
+      </section>
+
+      <section data-section="network">
+        <div>
+          <h2>Data Cost per 1GB (INR)</h2>
+          <div class="chart-container" id="chart-data-cost-wrap"><div class="chart-wrap"><canvas id="dataCostChart"></canvas></div></div>
+        </div>
+      </section>
+
+      <section data-section="network">
+        <div>
+          <h2>Connected Users Growth (Millions)</h2>
+          <div class="chart-container" id="chart-users-wrap"><div class="chart-wrap"><canvas id="usersGrowthChart"></canvas></div></div>
+        </div>
+      </section>
+
+      <section data-section="network">
+        <h2>The 'Jio' Effect — Users vs Cost</h2>
+        <div class="chart-container" id="chart-internet-wrap"><div class="chart-wrap"><canvas id="internetUsersChart"></canvas></div></div>
+      </section>
+
+      <section class="banger-slide" data-section="upi">
+        <h2>UPI — The Payments Rail</h2>
+        <div class="sentences">
+          <span class="sent-block">Instant. Interoperable. Low cost.</span>
+          <span class="sent-block">Enabled merchants and P2P at scale.</span>
+        </div>
+      </section>
+
+      <section data-section="upi">
+        <h2>Merchant Adoption (k)</h2>
+        <div class="chart-container" id="chart-merchant-wrap"><div class="chart-wrap"><canvas id="merchantAdoptionChart"></canvas></div></div>
+      </section>
+
+      <section data-section="upi">
+        <h2>Transaction Types</h2>
+        <div class="chart-container" id="chart-txntype-wrap"><div class="chart-wrap"><canvas id="txnTypeChart"></canvas></div></div>
+      </section>
+
+      <section data-section="upi">
+        <h2>UPI in Everyday Life</h2>
+        <div class="sentences">
+          <span class="sent-block">₹10 chai to P2P transfers.</span>
+          <span class="sent-block">Small merchants receiving instant settlement.</span>
+          <span class="sent-block">Recurring bill payments and subscriptions.</span>
+        </div>
+      </section>
+
+      <section data-section="upi">
+        <h2>UPI — Monthly Transaction Volume</h2>
+        <div class="chart-container" id="chart-upi-vol-wrap"><div class="chart-wrap"><canvas id="upiVolumeChart"></canvas></div></div>
+      </section>
+
+      <section data-section="upi">
+        <h2>UPI — Monthly Transaction Value</h2>
+        <div class="chart-container" id="chart-upi-val-wrap"><div class="chart-wrap"><canvas id="upiValueChart"></canvas></div></div>
+      </section>
+
+      <section data-section="upi">
+        <h2>Smartphone Penetration & ONDC</h2>
+        <div class="cols" style="margin-top:18px;">
+          <div class="col"><div class="chart-container" id="chart-phone-wrap"><div class="chart-wrap"><canvas id="phonePenetrationChart"></canvas></div></div></div>
+          <div class="col"><div class="chart-container" id="chart-ondc-wrap"><div class="chart-wrap"><canvas id="ondcAdoptionChart"></canvas></div></div></div>
+        </div>
+      </section>
+
+      <section class="banger-slide" data-section="ott">
+        <h2>The Great Indian Binge</h2>
+        <div class="sentences">
+          <span class="sent-block">Regional content found a huge audience.</span>
+          <span class="sent-block">Daily time spent on platforms surged.</span>
+        </div>
+      </section>
+
+      <section data-section="ott">
+        <h2>Regional Viewership Growth</h2>
+        <div class="chart-container dark" id="chart-regional-growth-wrap"><div class="chart-wrap"><canvas id="regionalGrowthChart"></canvas></div></div>
+      </section>
+
+      <section data-section="ott">
+        <h2>Daily Time Distribution</h2>
+        <div class="chart-container dark" id="chart-time-dist-wrap"><div class="chart-wrap"><canvas id="timeDistChart"></canvas></div></div>
+      </section>
+
+      <section data-section="ott">
+        <h2>Subscription vs Ad Revenue</h2>
+        <div class="chart-container dark" id="chart-subsad-wrap"><div class="chart-wrap"><canvas id="subsVsAdChart"></canvas></div></div>
+      </section>
+
+      <section data-section="ott">
+        <h2>OTT Revenue</h2>
+        <div class="chart-container dark" id="chart-ott-wrap"><div class="chart-wrap"><canvas id="ottRevenueChart"></canvas></div></div>
+      </section>
+
+      <section data-section="ott">
+        <h2>Regional Content Share</h2>
+        <div class="chart-container dark" id="chart-regional-wrap"><div class="chart-wrap"><canvas id="regionalContentChart"></canvas></div></div>
+      </section>
+
+      <section data-section="ott">
+        <h2>Daily Time Spent on OTT</h2>
+        <div class="chart-container dark" id="chart-daily-wrap"><div class="chart-wrap"><canvas id="dailyTimeChart"></canvas></div></div>
+      </section>
+
+      <section class="banger-slide" data-section="network">
+        <h2>The Next Decade: 2025 — 2035</h2>
+        <div class="sentences">
+          <span class="sent-block">AI + IoT at scale.</span>
+          <span class="sent-block">Sovereign stacks exported globally.</span>
+        </div>
+      </section>
+
+      <section class="banger-slide" data-section="none">
+        <h2>Design the next decade</h2>
+        <div class="sentences"><span class="sent-block">Infrastructure + policy + product = impact.</span></div>
+      </section>
+
+      <section class="banger-slide" data-section="none">
+        <h1>Thank you</h1>
+        <div class="sentences"><span class="sent-block">The next decade starts now.</span></div>
+      </section>
+
+    </div>
+  </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.js"></script>
+<script>
+  Reveal.initialize({ width:1600, height:900, controls:true, progress:true, history:true, center:true, transition:'slide', margin:0.04 });
+
+  // background mapping
+  const bgMap = { 'network':'image1.jpg', 'upi':'image2.jpg', 'ott':'image3.jpg', 'none':'image1.jpg' };
+  const fillImg = document.getElementById('bg-fill');
+  const containImg = document.getElementById('bg-contain');
+
+  // chart refs
+  const CHARTS = {};
+
+  // helper: set bg and toggle sent-block dark variant and global white text for ott
+  function setBG(state){
+    const file = bgMap[state] || bgMap['none'];
+    fillImg.style.opacity = 0; containImg.style.opacity = 0;
+    fillImg.src = file; containImg.src = file;
+    let loaded = 0;
+    const onLoad = ()=>{ loaded++; if(loaded===2) setTimeout(()=>{ fillImg.style.opacity=1; containImg.style.opacity=1; },60); };
+    fillImg.onload = onLoad; containImg.onload = onLoad;
+    fillImg.onerror = ()=>console.error('bg load failed', file);
+    containImg.onerror = ()=>console.error('bg load failed', file);
+
+    // set dataset for CSS
+    document.body.dataset.state = state || 'none';
+
+    // chart panel dark toggle
+    const dark = (state === 'ott');
+    document.querySelectorAll('.chart-container').forEach(el => { if(dark) el.classList.add('dark'); else el.classList.remove('dark'); });
+
+    // sentence-block theme toggle (adds/removes dark class) - headers will be overridden by CSS in ott
+    document.querySelectorAll('.sent-block').forEach(sb=>{
+      if(dark) sb.classList.add('dark'); else sb.classList.remove('dark');
+    });
+
+    // update charts theme
+    applyChartTheme(dark ? 'white' : 'black');
+  }
+
+  // create charts (same as earlier)
+  function createCharts(){
+    const baseOpts = (labelColor) => ({
+      responsive:true,
+      maintainAspectRatio:false,
+      plugins:{
+        legend:{ labels:{ color: labelColor, font:{size:12} } },
+        tooltip:{ titleColor: labelColor==='white' ? '#fff' : '#000', bodyColor: labelColor==='white' ? '#fff' : '#000', backgroundColor: labelColor==='white' ? 'rgba(0,0,0,0.8)' : '#fff' }
+      },
+      scales:{
+        x:{ ticks:{ color: labelColor }, grid:{ display:false } },
+        y:{ ticks:{ color: labelColor }, grid:{ color: labelColor==='white' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)' } }
+      }
+    });
+
+    CHARTS.dataCost = new Chart(document.getElementById('dataCostChart'), {
+      type:'line',
+      data:{ labels:['2015','2017','2019','2021','2023','2025'], datasets:[{ label:'₹ per GB', data:[270,75,15,11,8,5], borderColor:'#ff6b6b', backgroundColor:'#ff6b6b33', fill:true, tension:0.28 }] },
+      options: baseOpts('black')
+    });
+
+    CHARTS.usersGrowth = new Chart(document.getElementById('usersGrowthChart'), {
+      type:'line',
+      data:{ labels:['2015','2017','2019','2021','2023','2025'], datasets:[{ label:'Users (Millions)', data:[350,480,620,750,850,900], borderColor:'#3b82f6', backgroundColor:'#3b82f633', fill:true, tension:0.28 }] },
+      options: baseOpts('black')
+    });
+
+    CHARTS.internet = new Chart(document.getElementById('internetUsersChart'), {
+      type:'bar',
+      data:{
+        labels:['2015','2017','2019','2021','2023','2025'],
+        datasets:[
+          { type:'line', label:'Cost per 1GB (INR)', data:[270,75,15,11,8,5], borderColor:'#ff6b6b', backgroundColor:'#ff6b6b33', yAxisID:'y1', tension:0.28 },
+          { type:'bar', label:'Internet Users (M)', data:[350,480,620,750,850,900], backgroundColor:'#3b82f6', borderColor:'#1b4f9c', borderWidth:1 }
+        ]
+      },
+      options:{ ...baseOpts('black'), scales:{ ...baseOpts('black').scales, y1:{ position:'right', grid:{ drawOnChartArea:false }, ticks:{ color:'#ff6b6b' } } } }
+    });
+
+    CHARTS.merchant = new Chart(document.getElementById('merchantAdoptionChart'), {
+      type:'bar',
+      data:{ labels:['2018','2019','2020','2021','2022','2023'], datasets:[{ label:'Merchants (k)', data:[120,340,770,1500,2900,5200], backgroundColor:'#22c55e' }] },
+      options: baseOpts('black')
+    });
+
+    CHARTS.txnType = new Chart(document.getElementById('txnTypeChart'), {
+      type:'pie',
+      data:{ labels:['P2P','Merchant','BillPay','Recharge'], datasets:[{ data:[48,35,10,7], backgroundColor:['#3b82f6','#22c55e','#f97316','#a855f7'] }] },
+      options: baseOpts('black')
+    });
+
+    CHARTS.upiVol = new Chart(document.getElementById('upiVolumeChart'), {
+      type:'line',
+      data:{ labels:['2017','2018','2019','2020','2021','2022','2023','2024','2025'], datasets:[{ label:'Monthly UPI Transactions (B)', data:[0.01,0.2,0.8,1.3,3.8,7.8,11,15,20], borderColor:'#22c55e', backgroundColor:'#22c55e33', fill:true, tension:0.36 }] },
+      options: baseOpts('black')
+    });
+    CHARTS.upiVal = new Chart(document.getElementById('upiValueChart'), {
+      type:'bar',
+      data:{ labels:['2017','2019','2021','2023','2025'], datasets:[{ label:'Monthly Value (₹ Trillion)', data:[0.01,1.3,7.7,18,30], backgroundColor:'#3b82f6' }] },
+      options: baseOpts('black')
+    });
+
+    CHARTS.phone = new Chart(document.getElementById('phonePenetrationChart'), {
+      type:'line',
+      data:{ labels:['2015','2017','2019','2021','2023','2025'], datasets:[{ label:'Smartphone Penetration (%)', data:[28,38,49,62,74,82], borderColor:'#f97316', backgroundColor:'#f9731633', fill:true, tension:0.3 }] },
+      options: baseOpts('black')
+    });
+    CHARTS.ondc = new Chart(document.getElementById('ondcAdoptionChart'), {
+      type:'bar',
+      data:{ labels:['2019','2020','2021','2022','2023','2024'], datasets:[{ label:'ONDC merchants (k)', data:[0.2,1,4,12,36,95], backgroundColor:'#a855f7' }] },
+      options: baseOpts('black')
+    });
+
+    CHARTS.regionalGrowth = new Chart(document.getElementById('regionalGrowthChart'), {
+      type:'line',
+      data:{ labels:['2018','2019','2020','2021','2022','2023'],
+        datasets:[
+          { label:'Tamil', data:[1.1,1.6,2.3,3.8,5.1,7.2], borderColor:'#3b82f6', backgroundColor:'#3b82f633', fill:true, tension:0.32 },
+          { label:'Telugu', data:[0.9,1.4,2.0,3.2,4.6,6.3], borderColor:'#a855f7', backgroundColor:'#a855f733', fill:true, tension:0.32 }
+        ] }, options: baseOpts('white')
+    });
+
+    CHARTS.timeDist = new Chart(document.getElementById('timeDistChart'), {
+      type:'doughnut',
+      data:{ labels:['Short-form','Long-form','Live','Clips'], datasets:[{ data:[45,35,10,10], backgroundColor:['#f97316','#3b82f6','#22c55e','#a855f7'] }] },
+      options: baseOpts('white')
+    });
+
+    CHARTS.subsAd = new Chart(document.getElementById('subsVsAdChart'), {
+      type:'bar',
+      data:{ labels:['2018','2021','2025'], datasets:[{ label:'Subscription', data:[0.4,1.1,2.1], backgroundColor:'#f97316' },{ label:'Advertising', data:[0.3,0.8,1.4], backgroundColor:'#a855f7' }] },
+      options:{ ...baseOpts('white'), scales:{ x:{ stacked:true }, y:{ stacked:true, ticks:{ color: 'white' } } } }
+    });
+
+    CHARTS.ottRev = new Chart(document.getElementById('ottRevenueChart'), {
+      type:'bar', data:{ labels:['2018','2021','2025'], datasets:[ {label:'SVoD',data:[0.4,1.1,2.1], backgroundColor:'#f97316'}, {label:'AVoD',data:[0.3,0.8,1.4], backgroundColor:'#a855f7'} ] }, options: baseOpts('white')
+    });
+    CHARTS.regional = new Chart(document.getElementById('regionalContentChart'), {
+      type:'doughnut', data:{ labels:['Hindi','English','Tamil','Telugu','Bengali','Marathi','Other'], datasets:[{ data:[40,10,12,11,8,7,12], backgroundColor:['#3b82f6','#ff6b6b','#22c55e','#a855f7','#eab308','#f97316','#6b7280'] }] }, options: baseOpts('white')
+    });
+    CHARTS.daily = new Chart(document.getElementById('dailyTimeChart'), {
+      type:'line', data:{ labels:['2015','2017','2019','2021','2023','2025'], datasets:[{ label:'Avg Daily Minutes', data:[15,30,65,90,120,150], borderColor:'#a855f7', backgroundColor:'#a855f733', fill:true, tension:0.36 }] }, options: baseOpts('white')
+    });
+  }
+
+  function applyChartTheme(theme){
+    const labelColor = (theme === 'white' ? '#fff' : '#000');
+    Object.values(CHARTS).forEach(chart=>{
+      if(!chart) return;
+      if(chart.options.plugins && chart.options.plugins.legend) chart.options.plugins.legend.labels.color = labelColor;
+      if(chart.options.plugins && chart.options.plugins.title) chart.options.plugins.title.color = labelColor;
+      if(chart.options.plugins && chart.options.plugins.tooltip){
+        chart.options.plugins.tooltip.titleColor = (theme==='white' ? '#fff' : '#000');
+        chart.options.plugins.tooltip.bodyColor = (theme==='white' ? '#fff' : '#000');
+        chart.options.plugins.tooltip.backgroundColor = (theme==='white' ? 'rgba(0,0,0,0.8)' : '#fff');
+      }
+      if(chart.options.scales){
+        if(chart.options.scales.x && chart.options.scales.x.ticks) chart.options.scales.x.ticks.color = labelColor;
+        if(chart.options.scales.y && chart.options.scales.y.ticks) chart.options.scales.y.ticks.color = labelColor;
+        if(chart.options.scales.y1 && chart.options.scales.y1.ticks) chart.options.scales.y1.ticks.color = labelColor;
+        if(chart.options.scales.y && chart.options.scales.y.grid) chart.options.scales.y.grid.color = (theme==='white' ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)');
+      }
+      chart.update();
+    });
+  }
+
+  // initial create and set
+  Reveal.on('ready', event => {
+    setBG(event.currentSlide.getAttribute('data-section') || 'network');
+    createCharts();
+    applyChartTheme(document.body.dataset.state === 'ott' ? 'white' : 'black');
+  });
+
+  // outgoing animation helper
+  function animateOutgoing(prevSlide){
+    if(!prevSlide) return;
+    prevSlide.classList.remove('slide-zoom-out'); prevSlide.offsetWidth;
+    document.querySelector('.reveal').classList.add('slide-animating');
+    prevSlide.classList.add('slide-zoom-out');
+    const onEnd = ()=>{ prevSlide.classList.remove('slide-zoom-out'); document.querySelector('.reveal').classList.remove('slide-animating'); prevSlide.removeEventListener('animationend', onEnd); };
+    prevSlide.addEventListener('animationend', onEnd);
+  }
+
+  Reveal.on('slidechanged', event => {
+    const section = event.currentSlide.getAttribute('data-section') || 'none';
+    setBG(section);
+    animateOutgoing(event.previousSlide);
+  });
+
+  // setBG function (duplicated intentionally so setBG is available earlier)
+  function setBG(state){
+    const file = bgMap[state] || bgMap['none'];
+    fillImg.style.opacity = 0; containImg.style.opacity = 0;
+    fillImg.src = file; containImg.src = file;
+    let loaded = 0;
+    const onLoad = ()=>{ loaded++; if(loaded===2) setTimeout(()=>{ fillImg.style.opacity=1; containImg.style.opacity=1; },60); };
+    fillImg.onload = onLoad; containImg.onload = onLoad;
+    fillImg.onerror = ()=>console.error('bg load failed', file);
+    containImg.onerror = ()=>console.error('bg load failed', file);
+
+    // set dataset to allow CSS toggles
+    document.body.dataset.state = state;
+
+    // chart-panel dark toggle
+    const dark = (state === 'ott');
+    document.querySelectorAll('.chart-container').forEach(el => { if(dark) el.classList.add('dark'); else el.classList.remove('dark'); });
+
+    // sentence-block theme toggle
+    document.querySelectorAll('.sent-block').forEach(sb=>{
+      if(dark) sb.classList.add('dark'); else sb.classList.remove('dark');
+    });
+
+    applyChartTheme(dark ? 'white' : 'black');
+  }
+
+  // fullscreen
+  document.getElementById('fullscreen-btn').addEventListener('click', ()=>{ if(!document.fullscreenElement) document.documentElement.requestFullscreen().catch(()=>{}); else document.exitFullscreen(); });
+
+  // ===== TIMER LOGIC =====
+  const timerDisplay = document.getElementById('timer-display');
+  let totalSeconds = 10 * 60; // 10 minutes
+  let timerInterval = null;
+  let timerStarted = false;
+
+  // Helper to format time (handles negative)
+  function formatTime(seconds) {
+    const sign = seconds < 0 ? "-" : "";
+    const absSeconds = Math.abs(seconds);
+    const min = Math.floor(absSeconds / 60);
+    const sec = absSeconds % 60;
+    // Pad with '0' to ensure two digits
+    return `${sign}${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+  }
+
+  // The function that runs every second
+  function updateTimer() {
+    totalSeconds--;
+    timerDisplay.textContent = formatTime(totalSeconds);
+    
+    // Add negative class if time is up and it doesn't have it yet
+    if (totalSeconds < 0 && !timerDisplay.classList.contains('negative')) {
+      timerDisplay.classList.add('negative');
+    }
+  }
+
+  // Click listener to start the timer
+  timerDisplay.addEventListener('click', () => {
+    if (timerStarted) return; // Only allow starting once
+    timerStarted = true;
+    // Run once immediately so it doesn't wait 1s to show 9:59
+    updateTimer(); 
+    timerInterval = setInterval(updateTimer, 1000);
+  });
+  // ===== END: TIMER LOGIC =====
+
+  // resize charts on window size change
+  window.addEventListener('resize', ()=> Object.values(CHARTS).forEach(c=>c && c.resize && c.resize()));
+</script>
+</body>
+</html>
