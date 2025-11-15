@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>The Digital Decade — 50% Opaque Blocks</title>
+<title>The Digital Decade — Expanded Content</title>
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reset.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.3.1/reveal.min.css">
@@ -36,28 +36,22 @@
 
   /* SENTENCE BLOCKS (per-sentence translucent backgrounds) */
   .sentences { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; align-items:center; margin-top:12px; }
+  
+  /* ===== MODIFIED: All .sent-blocks are now "full white" ===== */
   .sent-block {
-    /* Default for non-network slides or when not explicitly set */
-    background: rgba(255,255,255,0.25);    /* white at 25% */
-    color: #000;                          /* black text */
+    background: rgba(255, 255, 255, 0.9) !important; /* 90% opaque white */
+    color: #000 !important;                          /* black text */
     padding: 8px 14px;
     border-radius: 10px;
     display:inline-block;
     font-size:1.05rem;
     line-height:1.4;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.1);
     max-width: 100%;
+    text-shadow: none;
   }
 
-  /* ===== MODIFIED: 50% opaque background for .sent-block when data-section="network" ===== */
-  body[data-state="network"] .sent-block {
-    background: rgba(255, 255, 255, 0.5) !important; /* 50% opaque white */
-    color: #000 !important; /* Keep text black for contrast */
-    text-shadow: none; /* Remove text shadow */
-    box-shadow: 0 6px 20px rgba(0,0,0,0.05); /* Keep a subtle shadow */
-  }
-
-  /* Dark variant used for image3+ (OTT) slides — still kept for contrast */
+  /* Dark variant used for image3+ (OTT) slides — this overrides the white */
   .sent-block.dark {
     background: rgba(0,0,0,0.25) !important;  /* black at 25% */
     color: #fff !important;
@@ -67,7 +61,6 @@
 
   /*
    * Move everything to top when network (image1) is active.
-   * Added !important to override reveal.js default centering.
   */
   body[data-state="network"] .reveal section[data-section="network"] {
     align-items: flex-start !important;      /* <-- FORCED */
@@ -83,7 +76,6 @@
 
   /* Keep other slides vertically centered (default) */
   .title-slide h1 { margin: 0 0 6px 0; font-weight:900; font-size:3.4rem; }
-  /* MODIFIED: Remove background from the p tag on the title slide */
   .title-slide p { margin:0; color: #222; background: none !important; }
 
   .banger-slide { gap:10px; padding:40px 20px; }
@@ -95,11 +87,17 @@
   .chart-wrap{ width:100%; height:100%; display:flex; align-items:center; justify-content:center; }
   .chart-wrap canvas{ max-width:100%; max-height:100%; width:100% !important; height:100% !important; }
 
-  .text-card{ background: transparent; padding:10px 18px; border-radius:10px; max-width:880px; margin:10px auto; }
-
-  .cols{ display:flex; gap:22px; justify-content:center; flex-wrap:wrap; margin-top:12px; }
+  .cols{ display:flex; gap:22px; justify-content:center; flex-wrap:wrap; margin-top:12px; width: 100%; }
   .col{ flex:1 1 320px; min-width:240px; max-width:460px; text-align:center; }
 
+  /* ===== FIX: ONDC Graph Overlap ===== */
+  /* Make chart containers inside columns flexible */
+  .col .chart-container {
+    width: 100%; /* Use 100% of the column width */
+    max-width: none; /* Remove the fixed max-width */
+    height: 40vh; /* Adjust height for the smaller container */
+  }
+  
   .slide-footer{ position:absolute; bottom:14px; left:20px; right:20px; text-align:center; font-size:13px; opacity:.9; color:inherit; }
 
   #fullscreen-btn{ position:fixed; top:12px; right:12px; z-index:99999; padding:8px 12px; border-radius:8px; background:rgba(255,255,255,0.9); color:#000; border:1px solid rgba(0,0,0,0.06); cursor:pointer; }
@@ -184,6 +182,8 @@
           <span class="sent-block">Connectivity scaled fast and cheap.</span>
           <span class="sent-block">Payments became instant and interoperable.</span>
           <span class="sent-block">Content found a new regional audience.</span>
+          <span class="sent-block">Identity became digital and verifiable.</span>
+          <span class="sent-block">Access to services moved from analog to digital.</span>
         </div>
         <div class="slide-footer">Presentation — The Digital Decade</div>
       </section>
@@ -191,9 +191,12 @@
       <section class="banger-slide" data-section="network">
         <h2>How do you digitally connect a nation of 1.4 billion in 10 years?</h2>
         <div class="sentences">
-          <span class="sent-block">You make access affordable.</span>
-          <span class="sent-block">You build public rails.</span>
+          <span class="sent-block">You make data access affordable.</span>
+          <span class="sent-block">You build open public rails.</span>
           <span class="sent-block">You let people invent use-cases.</span>
+          <span class="sent-block">You make smartphones ubiquitous.</span>
+          <span class="sent-block">You digitize government services.</span>
+          <span class="sent-block">You foster a competitive private sector.</span>
         </div>
       </section>
 
@@ -204,6 +207,8 @@
             <span class="sent-block">Data price fell >95% (2015→2025).</span>
             <span class="sent-block">Smartphone affordability widened reach.</span>
             <span class="sent-block">Rural adoption accelerated growth.</span>
+            <span class="sent-block">Fiber optic infrastructure expanded rapidly.</span>
+            <span class="sent-block">Tier 2 & 3 cities came online for the first time.</span>
           </div>
         </div>
       </section>
@@ -232,6 +237,9 @@
         <div class="sentences">
           <span class="sent-block">Instant. Interoperable. Low cost.</span>
           <span class="sent-block">Enabled merchants and P2P at scale.</span>
+          <span class="sent-block">Zero Merchant Discount Rate (MDR) spurred adoption.</span>
+          <span class="sent-block">Built as a public utility on top of the India Stack.</span>
+          <span class="sent-block">It became the default way to pay.</span>
         </div>
       </section>
 
@@ -251,6 +259,9 @@
           <span class="sent-block">₹10 chai to P2P transfers.</span>
           <span class="sent-block">Small merchants receiving instant settlement.</span>
           <span class="sent-block">Recurring bill payments and subscriptions.</span>
+          <span class="sent-block">Credit card linkage (RuPay).</span>
+          <span class="sent-block">International expansion to new countries.</span>
+          <span class="sent-block">Embedded in every consumer app.</span>
         </div>
       </section>
 
@@ -266,17 +277,100 @@
 
       <section data-section="upi">
         <h2>Smartphone Penetration & ONDC</h2>
-        <div class="cols" style="margin-top:18px;">
+        <div class="cols">
           <div class="col"><div class="chart-container" id="chart-phone-wrap"><div class="chart-wrap"><canvas id="phonePenetrationChart"></canvas></div></div></div>
           <div class="col"><div class="chart-container" id="chart-ondc-wrap"><div class="chart-wrap"><canvas id="ondcAdoptionChart"></canvas></div></div></div>
         </div>
       </section>
 
+      <section class="banger-slide" data-section="upi">
+        <h2>The India Stack</h2>
+        <div class="sentences">
+          <span class="sent-block">The foundation for digitization.</span>
+          <span class="sent-block">Aadhaar: Digital identity for 1.3B+ people.</span>
+          <span class="sent-block">eKYC: Instant, paperless verification.</span>
+          <span class="sent-block">DigiLocker: A secure digital document wallet.</span>
+          <span class="sent-block">eSign: Paperless, legally binding signatures.</span>
+          <span class="sent-block">Account Aggregator: Secure financial data sharing.</span>
+        </div>
+      </section>
+
+      <section class="banger-slide" data-section="upi">
+        <h2>The Startup & Unicorn Boom</h2>
+        <div class="sentences">
+          <span class="sent-block">3rd largest startup ecosystem globally.</span>
+          <span class="sent-block">Over 100 "Unicorns" (companies valued > $1B).</span>
+          <span class="sent-block">Fintech, SaaS, and E-commerce led the wave.</span>
+          <span class="sent-block">Venture capital flowed into new digital ideas.</span>
+          <span class="sent-block">Policy support from 'Startup India' initiative.</span>
+          <span class="sent-block">"Solving for India" became a global playbook.</span>
+        </div>
+      </section>
+
+      <section class="banger-slide" data-section="upi">
+        <h2>E-commerce Revolution</h2>
+        <div class="sentences">
+          <span class="sent-block">Flipkart & Amazon brought online shopping to the masses.</span>
+          <span class="sent-block">Tier-2 and Tier-3 cities drove new growth.</span>
+          <span class="sent-block">"Cash on Delivery" built initial trust.</span>
+          <span class="sent-block">A new wave of Direct-to-Consumer (D2C) brands emerged.</span>
+          <span class="sent-block">Logistics & supply chains were built from scratch.</span>
+          <span class="sent-block">Social commerce and quick-commerce boomed.</span>
+        </div>
+      </section>
+      
+      <section class="banger-slide" data-section="upi">
+        <h2>The Rise of EdTech</h2>
+        <div class="sentences">
+          <span class="sent-block">Online learning moved from niche to mainstream.</span>
+          <span class="sent-block">Platforms like Byju's & Unacademy became household names.</span>
+          <span class="sent-block">Access to quality test prep and skills scaled nationally.</span>
+          <span class="sent-block">The 2020 pandemic massively accelerated adoption.</span>
+          <span class="sent-block">Skill-based learning for professionals.</span>
+          <span class="sent-block">K-12 and competitive exam prep dominated.</span>
+        </div>
+      </section>
+      
+      <section class="banger-slide" data-section="upi">
+        <h2>The SaaS Revolution</h2>
+        <div class="sentences">
+          <span class="sent-block">"Building from India, for the World."</span>
+          <span class="sent-block">Companies like Zoho & Freshworks became global leaders.</span>
+          <span class="sent-block">Software-as-a-Service (SaaS) became a huge export.</span>
+          <span class="sent-block">High-quality talent at a competitive cost.</span>
+          <span class="sent-block">Vertical SaaS solved specific industry problems.</span>
+        </div>
+      </section>
+      
+      <section class="banger-slide" data-section="upi">
+        <h2>Digital Public Goods (DPGs)</h2>
+        <div class="sentences">
+          <span class="sent-block">India's philosophy: Build open, reusable platforms.</span>
+          <span class="sent-block">UPI, Aadhaar, and ONDC are all DPGs.</span>
+          <span class="sent-block">Enables private companies to innovate on top.</span>
+          <span class="sent-block">Reduces cost and time for new services.</span>
+          <span class="sent-block">This model is now being exported globally.</span>
+        </div>
+      </section>
+      
+      <section class="banger-slide" data-section="upi">
+        <h2>Gaming & E-sports</h2>
+        <div class="sentences">
+          <span class="sent-block">From passive content to interactive entertainment.</span>
+          <span class="sent-block">One of the world's largest mobile gaming markets.</span>
+          <span class="sent-block">Cheap data + powerful phones were the catalyst.</span>
+          <span class="sent-block">Real Money Gaming and E-sports surged.</span>
+          <span class="sent-block">A new generation of content creators.</span>
+        </div>
+      </section>
       <section class="banger-slide" data-section="ott">
         <h2>The Great Indian Binge</h2>
         <div class="sentences">
           <span class="sent-block">Regional content found a huge audience.</span>
           <span class="sent-block">Daily time spent on platforms surged.</span>
+          <span class="sent-block">Low-cost data was the fuel for video.</span>
+          <span class="sent-block">Mobile-first consumption patterns dominated.</span>
+          <span class="sent-block">YouTube, Hotstar, Netflix, and Prime Video led.</span>
         </div>
       </section>
 
@@ -315,17 +409,27 @@
         <div class="sentences">
           <span class="sent-block">AI + IoT at scale.</span>
           <span class="sent-block">Sovereign stacks exported globally.</span>
+          <span class="sent-block">Focus moves to Deep Tech and R&D.</span>
+          <span class="sent-block">Semiconductor & hardware manufacturing.</span>
+          <span class="sent-block">Digitizing healthcare, agriculture, and logistics.</span>
         </div>
       </section>
 
       <section class="banger-slide" data-section="none">
         <h2>Design the next decade</h2>
-        <div class="sentences"><span class="sent-block">Infrastructure + policy + product = impact.</span></div>
+        <div class="sentences">
+            <span class="sent-block">Infrastructure + policy + product = impact.</span>
+            <span class="sent-block">The next billion users are coming online.</span>
+            <span class="sent-block">Solving for India is solving for the world.</span>
+        </div>
       </section>
 
       <section class="banger-slide" data-section="none">
         <h1>Thank you</h1>
-        <div class="sentences"><span class="sent-block">The next decade starts now.</span></div>
+        <div class="sentences">
+            <span class="sent-block">The next decade starts now.</span>
+            <span class="sent-block">India's digital moment is here.</span>
+        </div>
       </section>
 
     </div>
@@ -385,94 +489,129 @@
       }
     });
 
-    CHARTS.dataCost = new Chart(document.getElementById('dataCostChart'), {
-      type:'line',
-      data:{ labels:['2015','2017','2019','2021','2023','2025'], datasets:[{ label:'₹ per GB', data:[270,75,15,11,8,5], borderColor:'#ff6b6b', backgroundColor:'#ff6b6b33', fill:true, tension:0.28 }] },
-      options: baseOpts('black')
-    });
+    // Check if element exists before creating chart
+    if (document.getElementById('dataCostChart')) {
+        CHARTS.dataCost = new Chart(document.getElementById('dataCostChart'), {
+        type:'line',
+        data:{ labels:['2015','2017','2019','2021','2023','2025'], datasets:[{ label:'₹ per GB', data:[270,75,15,11,8,5], borderColor:'#ff6b6b', backgroundColor:'#ff6b6b33', fill:true, tension:0.28 }] },
+        options: baseOpts('black')
+        });
+    }
 
-    CHARTS.usersGrowth = new Chart(document.getElementById('usersGrowthChart'), {
-      type:'line',
-      data:{ labels:['2015','2017','2019','2021','2023','2025'], datasets:[{ label:'Users (Millions)', data:[350,480,620,750,850,900], borderColor:'#3b82f6', backgroundColor:'#3b82f633', fill:true, tension:0.28 }] },
-      options: baseOpts('black')
-    });
+    if (document.getElementById('usersGrowthChart')) {
+        CHARTS.usersGrowth = new Chart(document.getElementById('usersGrowthChart'), {
+        type:'line',
+        data:{ labels:['2015','2017','2019','2021','2023','2025'], datasets:[{ label:'Users (Millions)', data:[350,480,620,750,850,900], borderColor:'#3b82f6', backgroundColor:'#3b82f633', fill:true, tension:0.28 }] },
+        options: baseOpts('black')
+        });
+    }
 
-    CHARTS.internet = new Chart(document.getElementById('internetUsersChart'), {
-      type:'bar',
-      data:{
-        labels:['2015','2017','2019','2021','2023','2025'],
-        datasets:[
-          { type:'line', label:'Cost per 1GB (INR)', data:[270,75,15,11,8,5], borderColor:'#ff6b6b', backgroundColor:'#ff6b6b33', yAxisID:'y1', tension:0.28 },
-          { type:'bar', label:'Internet Users (M)', data:[350,480,620,750,850,900], backgroundColor:'#3b82f6', borderColor:'#1b4f9c', borderWidth:1 }
-        ]
-      },
-      options:{ ...baseOpts('black'), scales:{ ...baseOpts('black').scales, y1:{ position:'right', grid:{ drawOnChartArea:false }, ticks:{ color:'#ff6b6b' } } } }
-    });
+    if (document.getElementById('internetUsersChart')) {
+        CHARTS.internet = new Chart(document.getElementById('internetUsersChart'), {
+        type:'bar',
+        data:{
+            labels:['2015','2017','2019','2021','2023','2025'],
+            datasets:[
+            { type:'line', label:'Cost per 1GB (INR)', data:[270,75,15,11,8,5], borderColor:'#ff6b6b', backgroundColor:'#ff6b6b33', yAxisID:'y1', tension:0.28 },
+            { type:'bar', label:'Internet Users (M)', data:[350,480,620,750,850,900], backgroundColor:'#3b82f6', borderColor:'#1b4f9c', borderWidth:1 }
+            ]
+        },
+        options:{ ...baseOpts('black'), scales:{ ...baseOpts('black').scales, y1:{ position:'right', grid:{ drawOnChartArea:false }, ticks:{ color:'#ff6b6b' } } } }
+        });
+    }
 
-    CHARTS.merchant = new Chart(document.getElementById('merchantAdoptionChart'), {
-      type:'bar',
-      data:{ labels:['2018','2019','2020','2021','2022','2023'], datasets:[{ label:'Merchants (k)', data:[120,340,770,1500,2900,5200], backgroundColor:'#22c55e' }] },
-      options: baseOpts('black')
-    });
+    if (document.getElementById('merchantAdoptionChart')) {
+        CHARTS.merchant = new Chart(document.getElementById('merchantAdoptionChart'), {
+        type:'bar',
+        data:{ labels:['2018','2019','2020','2021','2022','2023'], datasets:[{ label:'Merchants (k)', data:[120,340,770,1500,2900,5200], backgroundColor:'#22c55e' }] },
+        options: baseOpts('black')
+        });
+    }
 
-    CHARTS.txnType = new Chart(document.getElementById('txnTypeChart'), {
-      type:'pie',
-      data:{ labels:['P2P','Merchant','BillPay','Recharge'], datasets:[{ data:[48,35,10,7], backgroundColor:['#3b82f6','#22c55e','#f97316','#a855f7'] }] },
-      options: baseOpts('black')
-    });
+    if (document.getElementById('txnTypeChart')) {
+        CHARTS.txnType = new Chart(document.getElementById('txnTypeChart'), {
+        type:'pie',
+        data:{ labels:['P2P','Merchant','BillPay','Recharge'], datasets:[{ data:[48,35,10,7], backgroundColor:['#3b82f6','#22c55e','#f97316','#a855f7'] }] },
+        options: baseOpts('black')
+        });
+    }
 
-    CHARTS.upiVol = new Chart(document.getElementById('upiVolumeChart'), {
-      type:'line',
-      data:{ labels:['2017','2018','2019','2020','2021','2022','2023','2024','2025'], datasets:[{ label:'Monthly UPI Transactions (B)', data:[0.01,0.2,0.8,1.3,3.8,7.8,11,15,20], borderColor:'#22c55e', backgroundColor:'#22c55e33', fill:true, tension:0.36 }] },
-      options: baseOpts('black')
-    });
-    CHARTS.upiVal = new Chart(document.getElementById('upiValueChart'), {
-      type:'bar',
-      data:{ labels:['2017','2019','2021','2023','2025'], datasets:[{ label:'Monthly Value (₹ Trillion)', data:[0.01,1.3,7.7,18,30], backgroundColor:'#3b82f6' }] },
-      options: baseOpts('black')
-    });
+    if (document.getElementById('upiVolumeChart')) {
+        CHARTS.upiVol = new Chart(document.getElementById('upiVolumeChart'), {
+        type:'line',
+        data:{ labels:['2017','2018','2019','2020','2021','2022','2023','2024','2025'], datasets:[{ label:'Monthly UPI Transactions (B)', data:[0.01,0.2,0.8,1.3,3.8,7.8,11,15,20], borderColor:'#22c55e', backgroundColor:'#22c55e33', fill:true, tension:0.36 }] },
+        options: baseOpts('black')
+        });
+    }
+    
+    if (document.getElementById('upiValueChart')) {
+        CHARTS.upiVal = new Chart(document.getElementById('upiValueChart'), {
+        type:'bar',
+        data:{ labels:['2017','2019','2021','2023','2025'], datasets:[{ label:'Monthly Value (₹ Trillion)', data:[0.01,1.3,7.7,18,30], backgroundColor:'#3b82f6' }] },
+        options: baseOpts('black')
+        });
+    }
 
-    CHARTS.phone = new Chart(document.getElementById('phonePenetrationChart'), {
-      type:'line',
-      data:{ labels:['2015','2017','2019','2021','2023','2025'], datasets:[{ label:'Smartphone Penetration (%)', data:[28,38,49,62,74,82], borderColor:'#f97316', backgroundColor:'#f9731633', fill:true, tension:0.3 }] },
-      options: baseOpts('black')
-    });
-    CHARTS.ondc = new Chart(document.getElementById('ondcAdoptionChart'), {
-      type:'bar',
-      data:{ labels:['2019','2020','2021','2022','2023','2024'], datasets:[{ label:'ONDC merchants (k)', data:[0.2,1,4,12,36,95], backgroundColor:'#a855f7' }] },
-      options: baseOpts('black')
-    });
+    if (document.getElementById('phonePenetrationChart')) {
+        CHARTS.phone = new Chart(document.getElementById('phonePenetrationChart'), {
+        type:'line',
+        data:{ labels:['2015','2017','2019','2021','2023','2025'], datasets:[{ label:'Smartphone Penetration (%)', data:[28,38,49,62,74,82], borderColor:'#f97316', backgroundColor:'#f9731633', fill:true, tension:0.3 }] },
+        options: baseOpts('black')
+        });
+    }
+    
+    if (document.getElementById('ondcAdoptionChart')) {
+        CHARTS.ondc = new Chart(document.getElementById('ondcAdoptionChart'), {
+        type:'bar',
+        data:{ labels:['2019','2020','2021','2022','2023','2024'], datasets:[{ label:'ONDC merchants (k)', data:[0.2,1,4,12,36,95], backgroundColor:'#a855f7' }] },
+        options: baseOpts('black')
+        });
+    }
 
-    CHARTS.regionalGrowth = new Chart(document.getElementById('regionalGrowthChart'), {
-      type:'line',
-      data:{ labels:['2018','2019','2020','2021','2022','2023'],
-        datasets:[
-          { label:'Tamil', data:[1.1,1.6,2.3,3.8,5.1,7.2], borderColor:'#3b82f6', backgroundColor:'#3b82f633', fill:true, tension:0.32 },
-          { label:'Telugu', data:[0.9,1.4,2.0,3.2,4.6,6.3], borderColor:'#a855f7', backgroundColor:'#a855f733', fill:true, tension:0.32 }
-        ] }, options: baseOpts('white')
-    });
+    if (document.getElementById('regionalGrowthChart')) {
+        CHARTS.regionalGrowth = new Chart(document.getElementById('regionalGrowthChart'), {
+        type:'line',
+        data:{ labels:['2018','2019','2020','2021','2022','2023'],
+            datasets:[
+            { label:'Tamil', data:[1.1,1.6,2.3,3.8,5.1,7.2], borderColor:'#3b82f6', backgroundColor:'#3b82f633', fill:true, tension:0.32 },
+            { label:'Telugu', data:[0.9,1.4,2.0,3.2,4.6,6.3], borderColor:'#a855f7', backgroundColor:'#a855f733', fill:true, tension:0.32 }
+            ] }, options: baseOpts('white')
+        });
+    }
 
-    CHARTS.timeDist = new Chart(document.getElementById('timeDistChart'), {
-      type:'doughnut',
-      data:{ labels:['Short-form','Long-form','Live','Clips'], datasets:[{ data:[45,35,10,10], backgroundColor:['#f97316','#3b82f6','#22c55e','#a855f7'] }] },
-      options: baseOpts('white')
-    });
+    if (document.getElementById('timeDistChart')) {
+        CHARTS.timeDist = new Chart(document.getElementById('timeDistChart'), {
+        type:'doughnut',
+        data:{ labels:['Short-form','Long-form','Live','Clips'], datasets:[{ data:[45,35,10,10], backgroundColor:['#f97316','#3b82f6','#22c55e','#a855f7'] }] },
+        options: baseOpts('white')
+        });
+    }
 
-    CHARTS.subsAd = new Chart(document.getElementById('subsVsAdChart'), {
-      type:'bar',
-      data:{ labels:['2018','2021','2025'], datasets:[{ label:'Subscription', data:[0.4,1.1,2.1], backgroundColor:'#f97316' },{ label:'Advertising', data:[0.3,0.8,1.4], backgroundColor:'#a855f7' }] },
-      options:{ ...baseOpts('white'), scales:{ x:{ stacked:true }, y:{ stacked:true, ticks:{ color: 'white' } } } }
-    });
+    if (document.getElementById('subsVsAdChart')) {
+        CHARTS.subsAd = new Chart(document.getElementById('subsVsAdChart'), {
+        type:'bar',
+        data:{ labels:['2018','2021','2025'], datasets:[{ label:'Subscription', data:[0.4,1.1,2.1], backgroundColor:'#f97316' },{ label:'Advertising', data:[0.3,0.8,1.4], backgroundColor:'#a855f7' }] },
+        options:{ ...baseOpts('white'), scales:{ x:{ stacked:true }, y:{ stacked:true, ticks:{ color: 'white' } } } }
+        });
+    }
 
-    CHARTS.ottRev = new Chart(document.getElementById('ottRevenueChart'), {
-      type:'bar', data:{ labels:['2018','2021','2025'], datasets:[ {label:'SVoD',data:[0.4,1.1,2.1], backgroundColor:'#f97316'}, {label:'AVoD',data:[0.3,0.8,1.4], backgroundColor:'#a855f7'} ] }, options: baseOpts('white')
-    });
-    CHARTS.regional = new Chart(document.getElementById('regionalContentChart'), {
-      type:'doughnut', data:{ labels:['Hindi','English','Tamil','Telugu','Bengali','Marathi','Other'], datasets:[{ data:[40,10,12,11,8,7,12], backgroundColor:['#3b82f6','#ff6b6b','#22c55e','#a855f7','#eab308','#f97316','#6b7280'] }] }, options: baseOpts('white')
-    });
-    CHARTS.daily = new Chart(document.getElementById('dailyTimeChart'), {
-      type:'line', data:{ labels:['2015','2017','2019','2021','2023','2025'], datasets:[{ label:'Avg Daily Minutes', data:[15,30,65,90,120,150], borderColor:'#a855f7', backgroundColor:'#a855f733', fill:true, tension:0.36 }] }, options: baseOpts('white')
-    });
+    if (document.getElementById('ottRevenueChart')) {
+        CHARTS.ottRev = new Chart(document.getElementById('ottRevenueChart'), {
+        type:'bar', data:{ labels:['2018','2021','2025'], datasets:[ {label:'SVoD',data:[0.4,1.1,2.1], backgroundColor:'#f97316'}, {label:'AVoD',data:[0.3,0.8,1.4], backgroundColor:'#a855f7'} ] }, options: baseOpts('white')
+        });
+    }
+    
+    if (document.getElementById('regionalContentChart')) {
+        CHARTS.regional = new Chart(document.getElementById('regionalContentChart'), {
+        type:'doughnut', data:{ labels:['Hindi','English','Tamil','Telugu','Bengali','Marathi','Other'], datasets:[{ data:[40,10,12,11,8,7,12], backgroundColor:['#3b82f6','#ff6b6b','#22c55e','#a855f7','#eab308','#f97316','#6b7280'] }] }, options: baseOpts('white')
+        });
+    }
+
+    if (document.getElementById('dailyTimeChart')) {
+        CHARTS.daily = new Chart(document.getElementById('dailyTimeChart'), {
+        type:'line', data:{ labels:['2015','2017','2019','2021','2023','2025'], datasets:[{ label:'Avg Daily Minutes', data:[15,30,65,90,120,150], borderColor:'#a855f7', backgroundColor:'#a855f733', fill:true, tension:0.36 }] }, options: baseOpts('white')
+        });
+    }
   }
 
   function applyChartTheme(theme){
