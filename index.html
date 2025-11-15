@@ -635,8 +635,24 @@
     });
   }
 
+  // ===== NEW: Image Preloader Function =====
+  // This function runs once to force the browser to download all images into the cache.
+  function preloadImages() {
+    // Get all unique image URLs from the bgMap
+    const uniqueImages = [...new Set(Object.values(bgMap))]; 
+    
+    uniqueImages.forEach(src => {
+      const img = new Image(); // Create a new image object in memory
+      img.src = src; // Set its source. This triggers the browser to download it.
+    });
+  }
+  // ===== END: Image Preloader Function =====
+
+
   // initial create and set
   Reveal.on('ready', event => {
+    preloadImages(); // <-- PRELOAD ALL IMAGES
+    
     setBG(event.currentSlide.getAttribute('data-section') || 'network');
     createCharts();
     applyChartTheme(document.body.dataset.state === 'ott' ? 'white' : 'black');
@@ -664,6 +680,7 @@
     fillImg.style.opacity = 0; containImg.style.opacity = 0;
     fillImg.src = file; containImg.src = file;
     let loaded = 0;
+    // The onload handler now finds the image in the cache, so it fires instantly.
     const onLoad = ()=>{ loaded++; if(loaded===2) setTimeout(()=>{ fillImg.style.opacity=1; containImg.style.opacity=1; },60); };
     fillImg.onload = onLoad; containImg.onload = onLoad;
     fillImg.onerror = ()=>console.error('bg load failed', file);
